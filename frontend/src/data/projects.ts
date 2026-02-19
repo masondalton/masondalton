@@ -59,6 +59,42 @@ export const projects: Project[] = [
   },
 
   {
+    id: 'ml-pipeline-deployment',
+    slug: 'ml-pipeline-deployment',
+    title: 'ML Pipeline Deployment',
+    summary:
+      'End-to-end ML pipeline with ETL, model training, Lambda API, and serverless Next.js frontend on AWS',
+    status: 'active',
+    category: 'technical',
+    problem:
+      'Demonstrate production-ready ML: schema validation, ETL into a data warehouse, model training, and inference via a serverless API—all orchestrated on AWS with scheduled pipeline runs.',
+    approach:
+      'Built a Python ETL pipeline (schema validation, warehouse build, scikit-learn training) running in Lambda. Deployed HTTP API via API Gateway and Lambda for inference. Static Next.js frontend consumes the API; both static assets and data/artifacts use S3 with CloudFront. EventBridge triggers the pipeline daily.',
+    outcome:
+      'Full serverless ML stack: users browse orders, priority queue, and run inference through a clean UI. Data flows from source DB through validation, ETL, training, and inference—all automated and cost-efficient.',
+    techStack: [
+      'Python',
+      'scikit-learn',
+      'Next.js',
+      'AWS Lambda',
+      'API Gateway',
+      'S3',
+      'EventBridge',
+    ],
+    links: [
+      {
+        label: 'View / Test Project',
+        url: 'https://www.daltonforge.com/machinelearningpipeline',
+        placeholder: false,
+      },
+    ],
+    screenshots: [],
+    learned:
+      'Gained experience orchestrating serverless ML pipelines, designing APIs for inference, and integrating static frontends with Lambda backends. Learned to structure multi-bucket S3 deployments and manage CORS/API contracts.',
+    featured: true,
+    date: '2025-01-20',
+  },
+  {
     id: 'nasa-explorer',
     slug: 'nasa-explorer',
     title: 'NASA Explorer with Wikipedia Integration',
