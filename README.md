@@ -1,12 +1,14 @@
 # Personal Website
 
-A personal portfolio website with a NASA Explorer project featuring integrated Wikipedia definitions.
+A personal portfolio website with a NASA Explorer project and a Late Delivery Prediction ML Pipeline app.
 
 ## Project Structure
 
 ```
 .
 ├── backend/          # (Optional) Python FastAPI backend service - not required for frontend
+├── infra/            # Terraform for static site + ML pipeline hosting
+├── scripts/          # Deployment scripts
 └── frontend/         # React + TypeScript frontend
     └── src/
         ├── pages/    # Page components
@@ -74,6 +76,25 @@ The NASA Explorer project provides an interactive interface to explore NASA APIs
 4. Browse items in the grid view
 5. Click on any item to see detailed information with linked scientific terms
 
+## ML Pipeline (Late Delivery Prediction)
+
+The ML Pipeline project is an end-to-end system that predicts which orders are likely to be delivered late. It lives in a separate repo (`Dalton_Mason_ML_Pipeline_Deployment`) and is deployed as a static app under `/machinelearningpipeline`.
+
+**Pipeline Overview**
+- Schema validation → ETL to a warehouse table → model training → batch inference.
+- Predictions are stored in `order_predictions` and surfaced in the ML Pipeline web app.
+- Pipeline entrypoint: `jobs/run_scheduled_pipeline.py`.
+
+**Artifacts**
+- `artifacts/late_delivery_model.sav` (trained pipeline)
+- `artifacts/model_metadata.json` (features, threshold, timestamps)
+- `artifacts/metrics.json` (evaluation metrics)
+
+**Stack**
+- Python, pandas, scikit-learn, SQLite, Next.js.
+- AWS SAM (Lambda, EventBridge, S3, API Gateway) for the deployed pipeline/API.
+- Scheduled daily at 1:00 AM UTC in the cloud (local scheduling in `CRON_SETUP.md` in the ML repo).
+
 ## How It Works
 
 The frontend makes direct API calls to:
@@ -95,6 +116,21 @@ This prevents hitting API rate limits while providing a smooth user experience.
 - **Frontend:** React, TypeScript, Vite, Tailwind CSS
 - **APIs:** NASA Open APIs, Wikipedia REST API
 - **No Backend Required!** All API calls are made directly from the browser.
+
+## Infrastructure & Deployment
+
+Terraform in `infra/` provisions a private S3 bucket + CloudFront distribution for the site, and optionally a second private bucket for the ML Pipeline app mounted at `/machinelearningpipeline`.
+
+**ML Pipeline Hosting Details**
+- Separate S3 bucket with CloudFront Origin Access Control (OAC).
+- CloudFront behavior for `/machinelearningpipeline*` plus a rewrite function for SPA routing.
+- Deploy script: `./scripts/deploy.sh` builds the ML app (injecting `NEXT_PUBLIC_API_BASE_URL` from SAM outputs when available), builds the personal site, runs `terraform apply`, and invalidates CloudFront.
+
+**Key Infra Settings**
+- `ml_pipeline_enabled`: enable the ML Pipeline path (default `true`).
+- `ml_pipeline_source_dir`: path to the ML app build output (typically `<ML repo>/app/out`).
+- `ml_pipeline_upload`: upload ML assets via Terraform (default `true`).
+- `ML_PIPELINE_PATH`: environment variable used by `./scripts/deploy.sh` if the ML repo isn’t at the default path.
 
 ## Optional Backend
 
